@@ -11,8 +11,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.iaguapacha.reminder.ui.contactlist.ContactListScreen
 import com.iaguapacha.reminder.ui.theme.ReminderTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,10 +23,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ReminderTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    ContactListScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
