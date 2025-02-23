@@ -1,48 +1,46 @@
 package com.iaguapacha.reminder.data.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import java.time.LocalDateTime
+import androidx.room.Relation
 
 @Entity
 data class ContactEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     val name: String,
-    val phone: String,
-    val email: String
+    val day: Int,
+    val month: Int,
+    val year: Int? = null // null si no se conoce el año
 )
 
 @Entity(
     foreignKeys = [
         ForeignKey(
             entity = ContactEntity::class,
-            parentColumns = ["contactId"],
-            childColumns = ["contactOwnerId"],
-            onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
-            entity = LabelEntity::class,
-            parentColumns = ["labelId"],
-            childColumns = ["labelId"],
-            onDelete = ForeignKey.SET_NULL // Permite que un recordatorio tenga un label opcional.
+            parentColumns = ["id"],
+            childColumns = ["contactId"],
+            onDelete = ForeignKey.CASCADE // Al eliminar el contacto se borran sus notificaciones
         )
     ],
-    indices = [Index(value = ["contactOwnerId"]), Index(value = ["labelId"])]
+    indices = [Index(value = ["contactId"])]
 )
-data class ReminderEntity(
-    @PrimaryKey(autoGenerate = true) val reminderId: Long = 0,
-    val contactOwnerId: Long, // Relación al contacto
-    val labelId: Long?,       // Relación opcional a la etiqueta
-    val description: String,
-    val dateTime: LocalDateTime         // Tiempo en formato epoch
+data class NotificationEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    val contactId: Long,
+    val type: String, // Ej: "Fecha", "2 días antes", "1 semana antes"
+    val enabled: Boolean = true
 )
 
-
-@Entity
-data class LabelEntity(
-    @PrimaryKey(autoGenerate = true) val labelId: Long = 0,
-    val name: String
+data class ContactWithNotifications(
+    @Embedded val contact: ContactEntity,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "contactId"
+    )
+    val notifications: List<NotificationEntity>
 )
