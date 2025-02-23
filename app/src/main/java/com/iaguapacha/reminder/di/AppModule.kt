@@ -1,7 +1,8 @@
 package com.iaguapacha.reminder.di
 
 import android.content.Context
-import com.iaguapacha.reminder.data.datasource.DeviceContactsSource
+import androidx.room.Room
+import com.iaguapacha.reminder.data.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +16,15 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDeviceContactsSource(@ApplicationContext context: Context): DeviceContactsSource {
-        return DeviceContactsSource(context)
+    fun provideDatabase(@ApplicationContext appContext: Context): AppDatabase {
+        return Room.databaseBuilder(
+            appContext,
+            AppDatabase::class.java,
+            "birthday.db"
+        ).fallbackToDestructiveMigration().build()
     }
+
+    @Provides
+    fun provideContactDao(database: AppDatabase) = database.contactDao()
+
 }
