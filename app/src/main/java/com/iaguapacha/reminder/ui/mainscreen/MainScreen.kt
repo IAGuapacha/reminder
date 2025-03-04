@@ -30,7 +30,6 @@ import androidx.navigation.compose.rememberNavController
 import com.iaguapacha.reminder.ui.birthday.BirthdayScreen
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun MainScreen(navController: NavController) {
 
