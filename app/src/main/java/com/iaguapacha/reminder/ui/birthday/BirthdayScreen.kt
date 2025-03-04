@@ -26,6 +26,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.iaguapacha.reminder.data.model.ContactEntity
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 
 @Composable
@@ -71,9 +74,19 @@ fun CardContacts(contact: ContactEntity) {
                 .fillMaxWidth()
                 .padding(16.dp)) {
                 Text(text = contact.name)
-                Text(text = "Fecha cumpleaños")
+                Text(text = convertDate(contact.day, contact.month, contact.year ?: 0))
                 Text(text = "Dias para el cumpleaños")
             }
         }
     }
+}
+
+
+fun convertDate(day: Int, month: Int, year: Int): String {
+    val calendar: Calendar = Calendar.getInstance()
+    calendar.set(Calendar.DAY_OF_MONTH, day)
+    calendar.set(Calendar.MONTH, month - 1)
+
+    val sdf = SimpleDateFormat("d 'de' MMMM", Locale("es", "ES"))
+    return sdf.format(calendar.time)
 }

@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,13 +37,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -65,6 +71,7 @@ fun AddBirthdayScreen(
                 navController.popBackStack()
                 viewModel.handleEvent(AddBirthdayEvent.Navigated)
             }
+
             null -> Unit
         }
     }
@@ -107,14 +114,19 @@ fun AddBirthdayScreen(
                 NameField(
                     value = state.name,
                     onValueChange = { viewModel.handleEvent(AddBirthdayEvent.NameChanged(it)) },
-                    isError = state.error?.let {
-                        it == "El nombre no puede estar vacío"
-                    } ?: false
+                    error = state.nameError
                 )
 
-                DatePickerV2(
-                    selectedDate = state.date,
-                    onDateSelected = { viewModel.handleEvent(AddBirthdayEvent.DateChanged(it)) }
+                DatePickerV3(
+                    day = state.day,
+                    month = state.month,
+                    year = state.year,
+                    onDayChanged = { viewModel.handleEvent(AddBirthdayEvent.DayChanged(it)) },
+                    onMonthChanged = { viewModel.handleEvent(AddBirthdayEvent.MonthChanged(it)) },
+                    onYearChanged = { viewModel.handleEvent(AddBirthdayEvent.YearChanged(it)) },
+                    dayError = state.dayError,
+                    monthError = state.monthError,
+                    yearError = state.yearError
                 )
 
                 NotificationSelection(
@@ -164,56 +176,20 @@ fun SaveButton(
 fun NameField(
     value: String,
     onValueChange: (String) -> Unit,
-    isError: Boolean = false,
-    modifier: Modifier = Modifier
+    error: String?
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        label = {
-            Text(
-                text = "Nombre",
-                style = MaterialTheme.typography.bodyLarge
-            )
-        },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = null
-            )
-        },
-        isError = isError,
-        supportingText = {
-            if (isError) {
-                Text(
-                    text = "El nombre no puede estar vacío",
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-        },
-        singleLine = true,
-        textStyle = MaterialTheme.typography.bodyLarge,
-        shape = MaterialTheme.shapes.medium,
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
+            .padding(16.dp),
+        label = { Text("Nombre") },
+        isError = error != null,
+        supportingText = { ErrorText(error) },
         keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Words,
-            autoCorrect = false
-        ),
-        placeholder = {
-            Text(
-                text = "Ej: Camila",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            )
-        }
+            capitalization = KeyboardCapitalization.Words
+        )
     )
 }
 
@@ -239,7 +215,6 @@ fun NotificationSelection(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onSelectedChange(type) }
-                    .padding(8.dp)
             ) {
                 Checkbox(
                     checked = selected.contains(type),
@@ -252,31 +227,85 @@ fun NotificationSelection(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DatePickerV2(
-    selectedDate: LocalDate,
-    onDateSelected: (LocalDate) -> Unit
+fun DatePickerV3(
+    day: String,
+    month: String,
+    year: String,
+    onDayChanged: (String) -> Unit,
+    onMonthChanged: (String) -> Unit,
+    onYearChanged: (String) -> Unit,
+    dayError: String?,
+    monthError: String?,
+    yearError: String?
 ) {
-    val context = LocalContext.current
-    val dateFormatter = remember { DateTimeFormatter.ofPattern("dd/MM/yyyy") }
 
-    val datePickerDialog = DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            onDateSelected(LocalDate.of(year, month + 1, dayOfMonth))
-        },
-        selectedDate.year,
-        selectedDate.monthValue - 1,
-        selectedDate.dayOfMonth
-    )
+    Column() {
+        Text(
+            "Fecha de cumpleaños",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+        Text(
+            "Nota: El año es opcional",
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier
+                .fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp)
 
-    OutlinedButton(
-        onClick = { datePickerDialog.show() },
-        modifier = Modifier.fillMaxWidth().padding(16.dp)
-    ) {
-        Text("Seleccionar fecha: ${dateFormatter.format(selectedDate)}")
+        ) {
+            // Campo Día
+            OutlinedTextField(
+                value = day,
+                onValueChange = onDayChanged,
+                label = { Text("Día") },
+                modifier = Modifier.weight(1f),
+                isError = dayError != null,
+                supportingText = { ErrorText(dayError) },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number
+                )
+            )
+
+            // Campo Mes
+            OutlinedTextField(
+                value = month,
+                onValueChange = onMonthChanged,
+                label = { Text("Mes") },
+                modifier = Modifier.weight(1f),
+                isError = monthError != null,
+                supportingText = { ErrorText(monthError) },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number
+                )
+            )
+
+
+            // Campo Año
+            OutlinedTextField(
+                value = year,
+                onValueChange = onYearChanged,
+                label = { Text("Año") },
+                modifier = Modifier.weight(1f),
+                isError = yearError != null,
+                supportingText = { ErrorText(yearError) },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number
+                )
+            )
+        }
     }
-
 }
 
+@Composable
+private fun ErrorText(error: String?) {
+    if (error != null) {
+        Text(
+            text = error,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}
