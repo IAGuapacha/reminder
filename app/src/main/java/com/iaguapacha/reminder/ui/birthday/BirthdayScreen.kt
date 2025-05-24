@@ -1,6 +1,7 @@
 package com.iaguapacha.reminder.ui.birthday
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.iaguapacha.reminder.data.model.ContactEntity
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -34,6 +36,7 @@ import java.util.Locale
 @Composable
 fun BirthdayScreen(
     modifier: Modifier,
+    navController: NavController,
     viewModel: BirthdayViewModel = hiltViewModel()
 ) {
 
@@ -42,7 +45,9 @@ fun BirthdayScreen(
     LazyColumn(modifier = modifier.fillMaxWidth())
     {
         items(contacts) { contact ->
-            CardContacts(contact)
+            CardContacts(contact){
+                navController.navigate("birthdayDetail/${contact.id}")
+            }
         }
     }
 
@@ -53,8 +58,10 @@ fun BirthdayScreen(
 
 
 @Composable
-fun CardContacts(contact: ContactEntity) {
-    ElevatedCard(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
+fun CardContacts(contact: ContactEntity, function: () -> Unit) {
+    ElevatedCard(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp).clickable(
+        onClick = function
+    )) {
         Row(modifier = Modifier.padding(start = 16.dp)) {
             Box(
                 modifier = Modifier
@@ -70,9 +77,11 @@ fun CardContacts(contact: ContactEntity) {
                     modifier = Modifier.size(37.dp)
                 )
             }
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
                 Text(text = contact.name)
                 Text(text = convertDate(contact.day, contact.month, contact.year ?: 0))
                 Text(text = "Dias para el cumpleaños")
