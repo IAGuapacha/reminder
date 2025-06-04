@@ -1,15 +1,55 @@
+# Archivos de configuración del IDE
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+.idea/
+
+# Archivos específicos del sistema operativo
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+Thumbs.db
+
+# Archivos generados por Gradle
+.gradle/
+build/
+*/build/
+
+# Configuraciones locales
 local.properties
+/captures/
+.externalNativeBuild/
+.cxx/
+
+# Configuraciones de test o depuración
+*.log
+
+# Android Studio Navigation Editor
+.navigation/
+
+# Archivos generados por lint y otros análisis
+lint/intermediates/
+lint/generated/
+
+# Archivos de cache
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# Archivos relacionados a versiones específicas del sistema
+*.apk
+*.ap_
+*.aab
+
+# IntelliJ
+out/
+
+# Kapt / annotation processor
+.kapt/
+.ksp/
+
+# NDK
+obj/
+
+# Firebase Crashlytics (si usas)
+crashlytics-build.properties
+
