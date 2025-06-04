@@ -1,6 +1,5 @@
 package com.iaguapacha.reminder.ui.addbirthday
 
-import java.time.LocalDate
 
 data class AddBirthdayState(
     val name: String = "",
