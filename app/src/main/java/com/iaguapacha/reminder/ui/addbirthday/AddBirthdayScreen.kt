@@ -38,11 +38,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.iaguapacha.reminder.R
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,12 +70,12 @@ fun AddBirthdayScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Agregar cumpleaños") },
+                title = { Text(stringResource(id = R.string.add_birthday_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Atrás"
+                            contentDescription = stringResource(id = R.string.back)
                         )
                     }
                 }
@@ -95,7 +97,7 @@ fun AddBirthdayScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Person,
-                        contentDescription = "Persona",
+                        contentDescription = stringResource(id = R.string.person),
                         modifier = Modifier.size(50.dp)
                     )
                 }
@@ -103,10 +105,11 @@ fun AddBirthdayScreen(
                 NameField(
                     value = state.name,
                     onValueChange = { viewModel.handleEvent(AddBirthdayEvent.NameChanged(it)) },
-                    error = state.nameError
+                    error = state.nameError,
+                    label = stringResource(id = R.string.name)
                 )
 
-                DatePickerV3(
+                DatePicker(
                     day = state.day,
                     month = state.month,
                     year = state.year,
@@ -115,7 +118,12 @@ fun AddBirthdayScreen(
                     onYearChanged = { viewModel.handleEvent(AddBirthdayEvent.YearChanged(it)) },
                     dayError = state.dayError,
                     monthError = state.monthError,
-                    yearError = state.yearError
+                    yearError = state.yearError,
+                    label = stringResource(id = R.string.birthday_date),
+                    note = stringResource(id = R.string.note_year_optional),
+                    dayLabel = stringResource(id = R.string.day),
+                    monthLabel = stringResource(id = R.string.month),
+                    yearLabel = stringResource(id = R.string.year)
                 )
 
                 NotificationSelection(
@@ -156,7 +164,7 @@ fun SaveButton(
         if (isLoading) {
             CircularProgressIndicator(color = Color.White)
         } else {
-            Text("Guardar")
+            Text(stringResource(id = R.string.save))
         }
     }
 }
@@ -165,7 +173,8 @@ fun SaveButton(
 fun NameField(
     value: String,
     onValueChange: (String) -> Unit,
-    error: String?
+    error: String?,
+    label: String
 ) {
     OutlinedTextField(
         value = value,
@@ -173,7 +182,7 @@ fun NameField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        label = { Text("Nombre") },
+        label = { Text(label) },
         isError = error != null,
         supportingText = { ErrorText(error) },
         keyboardOptions = KeyboardOptions(
@@ -195,7 +204,7 @@ fun NotificationSelection(
     onSelectedChange: (NotificationType) -> Unit
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
-        Text("Notificaciones", style = MaterialTheme.typography.titleSmall)
+        Text(stringResource(id = R.string.notifications), style = MaterialTheme.typography.titleSmall)
         Spacer(Modifier.height(8.dp))
 
         NotificationType.entries.forEach { type ->
@@ -209,7 +218,11 @@ fun NotificationSelection(
                     checked = selected.contains(type),
                     onCheckedChange = { onSelectedChange(type) }
                 )
-                Text(type.label, modifier = Modifier.padding(start = 8.dp))
+                Text(stringResource(id = when(type) {
+                    NotificationType.ON_DATE -> R.string.on_date
+                    NotificationType.TWO_DAYS_BEFORE -> R.string.two_days_before
+                    NotificationType.ONE_WEEK_BEFORE -> R.string.one_week_before
+                }), modifier = Modifier.padding(start = 8.dp))
             }
 
         }
@@ -217,7 +230,7 @@ fun NotificationSelection(
 }
 
 @Composable
-fun DatePickerV3(
+fun DatePicker(
     day: String,
     month: String,
     year: String,
@@ -226,17 +239,22 @@ fun DatePickerV3(
     onYearChanged: (String) -> Unit,
     dayError: String?,
     monthError: String?,
-    yearError: String?
+    yearError: String?,
+    label: String,
+    note: String,
+    dayLabel: String,
+    monthLabel: String,
+    yearLabel: String
 ) {
 
     Column() {
         Text(
-            "Fecha de cumpleaños",
+            label,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp)
         )
         Text(
-            "Nota: El año es opcional",
+            note,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(start = 16.dp)
         )
@@ -249,7 +267,7 @@ fun DatePickerV3(
             OutlinedTextField(
                 value = day,
                 onValueChange = onDayChanged,
-                label = { Text("Día") },
+                label = { Text(dayLabel) },
                 modifier = Modifier.weight(1f),
                 isError = dayError != null,
                 supportingText = { ErrorText(dayError) },
@@ -262,7 +280,7 @@ fun DatePickerV3(
             OutlinedTextField(
                 value = month,
                 onValueChange = onMonthChanged,
-                label = { Text("Mes") },
+                label = { Text(monthLabel) },
                 modifier = Modifier.weight(1f),
                 isError = monthError != null,
                 supportingText = { ErrorText(monthError) },
@@ -276,7 +294,7 @@ fun DatePickerV3(
             OutlinedTextField(
                 value = year,
                 onValueChange = onYearChanged,
-                label = { Text("Año") },
+                label = { Text(yearLabel) },
                 modifier = Modifier.weight(1f),
                 isError = yearError != null,
                 supportingText = { ErrorText(yearError) },

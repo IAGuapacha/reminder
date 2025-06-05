@@ -20,6 +20,8 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,11 +37,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.iaguapacha.reminder.data.model.ContactWithNotifications
+import com.iaguapacha.reminder.R
+import com.iaguapacha.reminder.data.model.ReminderWithNotifications
 import java.util.Calendar
 
 
@@ -47,14 +51,22 @@ import java.util.Calendar
 @Composable
 fun BirthdayDetailScreen(
     navController: NavController,
-    contactId: Long,
+    reminderId: Long,
     viewModel: BirthdayDetailViewModel = hiltViewModel()
 ) {
-
     val state by viewModel.state.collectAsState()
+    val showDeleteDialog by viewModel.showDeleteDialog.collectAsState()
+    val navigateBack by viewModel.navigateBack.collectAsState()
+
+    LaunchedEffect(navigateBack) {
+        if (navigateBack) {
+            navController.popBackStack()
+            viewModel.onNavigatedBack()
+        }
+    }
 
     LaunchedEffect(Unit) {
-        viewModel.loadData(contactId)
+        viewModel.loadData(reminderId)
     }
 
     Scaffold(
@@ -65,40 +77,47 @@ fun BirthdayDetailScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Atrás"
+                            contentDescription = stringResource(id = R.string.back)
                         )
                     }
                 }
             )
         },
         content = { padding ->
-
+            if (showDeleteDialog) {
+                AlertDialog(
+                    onDismissRequest = { viewModel.onDeleteDialogDismiss() },
+                    title = { Text(text = stringResource(id = R.string.delete)) },
+                    text = { Text(text = "¿Estás seguro de eliminar este cumpleaños?") },
+                    confirmButton = {
+                        Button(onClick = { viewModel.onDeleteConfirm() }) {
+                            Text("Sí")
+                        }
+                    },
+                    dismissButton = {
+                        Button(onClick = { viewModel.onDeleteDialogDismiss() }) {
+                            Text("No")
+                        }
+                    }
+                )
+            }
             when (state) {
-                BirthdayDetailState.Loading -> {
-
-                }
-
+                BirthdayDetailState.Loading -> { }
                 is BirthdayDetailState.Success -> {
-
                     Detail(
                         modifier = Modifier.padding(padding),
-                        (state as BirthdayDetailState.Success).contactDetail
+                        reminderDetail = (state as BirthdayDetailState.Success).reminderDetail,
+                        onDeleteClick = { viewModel.onDeleteClick() }
                     )
                 }
-
-                is BirthdayDetailState.Error -> {
-
-                }
+                is BirthdayDetailState.Error -> { }
             }
-
-
         }
     )
 }
 
-
 @Composable
-fun Detail(modifier: Modifier, contactDetail: ContactWithNotifications) {
+fun Detail(modifier: Modifier, reminderDetail: ReminderWithNotifications, onDeleteClick: () -> Unit) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -115,13 +134,13 @@ fun Detail(modifier: Modifier, contactDetail: ContactWithNotifications) {
         ) {
             Icon(
                 imageVector = Icons.Default.Person,
-                contentDescription = "Persona",
+                contentDescription = stringResource(id = R.string.person),
                 modifier = Modifier.size(50.dp)
             )
         }
 
         Text(
-            contactDetail.contact.name,
+            reminderDetail.reminder.name,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 12.dp, bottom = 12.dp),
@@ -129,19 +148,19 @@ fun Detail(modifier: Modifier, contactDetail: ContactWithNotifications) {
         )
 
         val dateFormat = formatFecha(
-            contactDetail.contact.day,
-            contactDetail.contact.month,
-            contactDetail.contact.year
+            reminderDetail.reminder.day,
+            reminderDetail.reminder.month,
+            reminderDetail.reminder.year
         )
         Text(
             dateFormat,
             modifier = Modifier.align(Alignment.CenterHorizontally),
             style = MaterialTheme.typography.bodyLarge
         )
-        val days = daysUntilBirthday(contactDetail.contact.day, contactDetail.contact.month)
+        val days = daysUntilBirthday(reminderDetail.reminder.day, reminderDetail.reminder.month)
 
         Text(
-            "$days Días",
+            stringResource(id = R.string.days, days),
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(50.dp),
@@ -157,9 +176,9 @@ fun Detail(modifier: Modifier, contactDetail: ContactWithNotifications) {
                 .padding(bottom = 50.dp)
         ) {
             RoundedIconButton(
-                onClick = { /* Tu acción aquí */ },
+                onClick = onDeleteClick,
                 icon = Icons.Default.Delete,
-                contentDescription = "Eliminar",
+                contentDescription = stringResource(id = R.string.delete),
                 backgroundColor = MaterialTheme.colorScheme.secondary,
                 iconTint = MaterialTheme.colorScheme.onSecondary
             )
@@ -167,7 +186,7 @@ fun Detail(modifier: Modifier, contactDetail: ContactWithNotifications) {
             RoundedIconButton(
                 onClick = { /* Tu acción aquí */ },
                 icon = Icons.Default.Edit,
-                contentDescription = "Editar",
+                contentDescription = stringResource(id = R.string.edit),
                 backgroundColor = MaterialTheme.colorScheme.secondary,
                 iconTint = MaterialTheme.colorScheme.onSecondary
             )
@@ -175,7 +194,7 @@ fun Detail(modifier: Modifier, contactDetail: ContactWithNotifications) {
             RoundedIconButton(
                 onClick = { /* Tu acción aquí */ },
                 icon = Icons.Default.Notifications,
-                contentDescription = "Notificaciones",
+                contentDescription = stringResource(id = R.string.notifications_action),
                 backgroundColor = MaterialTheme.colorScheme.secondary,
                 iconTint = MaterialTheme.colorScheme.onSecondary
             )
@@ -183,14 +202,12 @@ fun Detail(modifier: Modifier, contactDetail: ContactWithNotifications) {
             RoundedIconButton(
                 onClick = { /* Tu acción aquí */ },
                 icon = Icons.Default.Send,
-                contentDescription = "Enviar",
+                contentDescription = stringResource(id = R.string.send),
                 backgroundColor = MaterialTheme.colorScheme.secondary,
                 iconTint = MaterialTheme.colorScheme.onSecondary
             )
 
         }
-
-
     }
 }
 

@@ -2,8 +2,8 @@ package com.iaguapacha.reminder.ui.birthday
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iaguapacha.reminder.data.model.ContactEntity
-import com.iaguapacha.reminder.repository.ContactRepository
+import com.iaguapacha.reminder.data.model.ReminderEntity
+import com.iaguapacha.reminder.repository.ReminderRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,18 +13,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BirthdayViewModel @Inject constructor (
-    private val contactRepository: ContactRepository
+    private val reminderRepository: ReminderRepository
 ): ViewModel() {
-    private val _contacts = MutableStateFlow<List<ContactEntity>>(emptyList())
-    val contacts: StateFlow<List<ContactEntity>> = _contacts.asStateFlow()
+    private val _reminders = MutableStateFlow<List<ReminderEntity>>(emptyList())
+    val reminders: StateFlow<List<ReminderEntity>> = _reminders.asStateFlow()
 
-
-    fun getContacts() {
+    fun getReminders() {
         viewModelScope.launch {
-            contactRepository.getContacts().collect { contacts ->
-                _contacts.value = contacts
+            reminderRepository.getReminders().collect { reminders ->
+                _reminders.value = reminders
             }
         }
     }
-
 }
+

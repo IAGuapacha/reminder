@@ -1,11 +1,9 @@
 package com.iaguapacha.reminder.ui.mainscreen
 
-
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
@@ -25,7 +22,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
@@ -36,7 +32,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -47,12 +42,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.iaguapacha.reminder.R
+import com.iaguapacha.reminder.navigation.NavRoutes
 import com.iaguapacha.reminder.ui.birthday.BirthdayScreen
 import kotlinx.coroutines.launch
 
@@ -73,13 +71,13 @@ fun MainScreen(navController: NavController) {
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
-                        navController.navigate("addBirthday")
+                        navController.navigate(NavRoutes.AddBirthday.route)
                     },
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Add,
-                        contentDescription = "Agregar cumpleaños"
+                        contentDescription = stringResource(id = R.string.add_birthday)
                     )
                 }
             },
@@ -95,9 +93,9 @@ fun MainScreen(navController: NavController) {
         ) { innerPadding ->
             NavHost(
                 navController = navControllerLocal,
-                startDestination = "birthdays"
+                startDestination = NavRoutes.Birthdays.route
             ) {
-                composable("birthdays") { backStackEntry ->
+                composable(NavRoutes.Birthdays.route) { backStackEntry ->
                     BirthdayScreen(modifier = Modifier.padding(innerPadding), navController)
                 }
             }
@@ -112,15 +110,15 @@ fun TopBarWithHamburgerMenu(
     onNewChatClick: () -> Unit
 ) {
     CenterAlignedTopAppBar(
-        title = { Text("Cumpleaños", style = MaterialTheme.typography.headlineMedium) },
+        title = { Text(stringResource(id = R.string.birthday), style = MaterialTheme.typography.headlineMedium) },
         navigationIcon = {
             IconButton(onClick = onMenuClick) {
-                Icon(Icons.Default.Menu, contentDescription = "Menú")
+                Icon(Icons.Default.Menu, contentDescription = stringResource(id = R.string.menu))
             }
         },
         actions = {
             IconButton(onClick = onNewChatClick) {
-                Icon(Icons.Default.Add, contentDescription = "Nuevo cumpleaños")
+                Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.new_birthday))
             }
         }
     )
@@ -141,7 +139,7 @@ fun DrawerContent(context: Context) {
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 // Cabecera del menú
                 Text(
-                    text = "Cumpleaños",
+                    text = stringResource(id = R.string.birthday),
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -151,31 +149,31 @@ fun DrawerContent(context: Context) {
                 // Elementos de menú personalizados con espaciado reducido
                 CustomDrawerItem(
                     icon = Icons.Default.AccountBox,
-                    text = "Importar desde contactos",
+                    text = stringResource(id = R.string.import_from_contacts),
                     onClick = { /* Acción para importar contactos */ }
                 )
 
                 CustomDrawerItem(
                     icon = Icons.Default.DateRange,
-                    text = "Importar desde Calendario",
+                    text = stringResource(id = R.string.import_from_calendar),
                     onClick = { /* Acción para importar calendario */ }
                 )
 
                 CustomDrawerItem(
                     icon = Icons.Default.Settings,
-                    text = "Configuración",
+                    text = stringResource(id = R.string.settings),
                     onClick = { /* Acción para ir a configuracion */ }
                 )
 
                 CustomDrawerItem(
                     icon = Icons.Default.Share,
-                    text = "Compartir aplicación",
+                    text = stringResource(id = R.string.share_app),
                     onClick = { shareApp(context) }
                 )
 
                 CustomDrawerItem(
                     icon = Icons.Default.Star,
-                    text = "Calificar aplicación",
+                    text = stringResource(id = R.string.rate_app),
                     onClick = { /* Acción para calificar */ }
                 )
             }
@@ -191,7 +189,7 @@ fun DrawerContent(context: Context) {
                         .padding(horizontal = 16.dp, vertical = 0.dp)
                 ) {
                     Text(
-                        text = "Términos y condiciones",
+                        text = stringResource(id = R.string.terms_and_conditions),
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Start,
                         modifier = Modifier.fillMaxWidth()
@@ -205,7 +203,7 @@ fun DrawerContent(context: Context) {
                         .padding(horizontal = 16.dp, vertical = 0.dp)
                 ) {
                     Text(
-                        text = "Políticas de privacidad",
+                        text = stringResource(id = R.string.privacy_policy),
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Start,
                         modifier = Modifier.fillMaxWidth()
@@ -244,16 +242,14 @@ fun CustomDrawerItem(
 
 fun shareApp(context: Context) {
     val appPackageName = context.packageName
-    val shareText = "¡Hola! Te recomiendo esta aplicación para recordar cumpleaños. " +
-            "¡No te olvidarás de ningún cumpleaños importante! " +
-            "Descárgala en: https://play.google.com/store/apps/details?id=$appPackageName"
+    val shareText = context.getString(R.string.share_app_text, appPackageName)
 
     val shareIntent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
-        putExtra(Intent.EXTRA_SUBJECT, "App de Recordatorio de Cumpleaños")
+        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.share_app_subject))
         putExtra(Intent.EXTRA_TEXT, shareText)
     }
 
-    context.startActivity(Intent.createChooser(shareIntent, "Compartir vía"))
+    context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.share_via)))
 }
 

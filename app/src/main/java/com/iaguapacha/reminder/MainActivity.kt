@@ -14,6 +14,7 @@ import com.iaguapacha.reminder.ui.mainscreen.MainScreen
 import com.iaguapacha.reminder.ui.addbirthday.AddBirthdayScreen
 import com.iaguapacha.reminder.ui.birthdaydetail.BirthdayDetailScreen
 import com.iaguapacha.reminder.ui.theme.ReminderTheme
+import com.iaguapacha.reminder.navigation.NavRoutes
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -30,16 +31,16 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MyApp(){
+fun MyApp() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "main") {
-        composable("main") { MainScreen(navController) }
-        composable("addBirthday") { AddBirthdayScreen(navController) }
+    NavHost(navController = navController, startDestination = NavRoutes.Main.route) {
+        composable(NavRoutes.Main.route) { MainScreen(navController) }
+        composable(NavRoutes.AddBirthday.route) { AddBirthdayScreen(navController) }
         composable(
-            "birthdayDetail/{contactId}",
-            arguments = listOf(navArgument("contactId") { type = NavType.LongType })
+            NavRoutes.BirthdayDetail.route,
+            arguments = listOf(navArgument("reminderId") { type = NavType.LongType })
         ) { backStackEntry ->
-            val contactId = backStackEntry.arguments?.getLong("contactId")
+            val contactId = backStackEntry.arguments?.getLong("reminderId")
             BirthdayDetailScreen(navController, contactId ?: 0)
         }
     }
