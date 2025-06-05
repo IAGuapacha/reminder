@@ -1,3 +1,47 @@
 <resources>
     <string name="app_name">reminder</string>
+    <string name="add_birthday_title">Agregar cumpleaños</string>
+    <string name="back">Atrás</string>
+    <string name="person">Persona</string>
+    <string name="save">Guardar</string>
+    <string name="name">Nombre</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="on_date">En la fecha</string>
+    <string name="two_days_before">2 días antes</string>
+    <string name="one_week_before">1 semana antes</string>
+    <string name="birthday_date">Fecha de cumpleaños</string>
+    <string name="note_year_optional">Nota: El año es opcional</string>
+    <string name="day">Día</string>
+    <string name="month">Mes</string>
+    <string name="year">Año</string>
+    <string name="empty_birthday_title">¡Aún no hay cumpleaños guardados!</string>
+    <string name="empty_birthday_subtitle">Agrega el cumpleaños de tus seres queridos para recibir un recordatorio a tiempo.</string>
+    <string name="add_birthday">Agregar cumpleaños</string>
+    <string name="days_until_birthday">Días para el cumpleaños</string>
+    <string name="birthday">Cumpleaños</string>
+    <string name="menu">Menú</string>
+    <string name="new_birthday">Nuevo cumpleaños</string>
+    <string name="import_from_contacts">Importar desde contactos</string>
+    <string name="import_from_calendar">Importar desde Calendario</string>
+    <string name="settings">Configuración</string>
+    <string name="share_app">Compartir aplicación</string>
+    <string name="rate_app">Calificar aplicación</string>
+    <string name="terms_and_conditions">Términos y condiciones</string>
+    <string name="privacy_policy">Políticas de privacidad</string>
+    <string name="share_app_subject">App de Recordatorio de Cumpleaños</string>
+    <string name="share_app_text">¡Hola! Te recomiendo esta aplicación para recordar cumpleaños. ¡No te olvidarás de ningún cumpleaños importante! Descárgala en: https://play.google.com/store/apps/details?id=%1$s</string>
+    <string name="share_via">Compartir vía</string>
+    <string name="delete">Eliminar</string>
+    <string name="edit">Editar</string>
+    <string name="notifications_action">Notificaciones</string>
+    <string name="send">Enviar</string>
+    <string name="days">%1$d Días</string>
+    <string name="required_name">Nombre requerido</string>
+    <string name="invalid_day">Día inválido (1-31)</string>
+    <string name="required_day">Día requerido</string>
+    <string name="invalid_month">Mes inválido (1-12)</string>
+    <string name="required_month">Mes requerido</string>
+    <string name="invalid_year">Año inválido</string>
+    <string name="year_range">Año debe estar entre 1900 y %1$d</string>
+    <string name="error_saving">Error al guardar: %1$s</string>
 </resources>

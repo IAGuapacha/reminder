@@ -25,6 +25,6 @@ object AppModule {
     }
 
     @Provides
-    fun provideContactDao(database: AppDatabase) = database.contactDao()
+    fun provideReminderDao(database: AppDatabase) = database.reminderDao()
 
 }

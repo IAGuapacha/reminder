@@ -4,9 +4,9 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iaguapacha.reminder.data.model.ContactEntity
+import com.iaguapacha.reminder.data.model.ReminderEntity
 import com.iaguapacha.reminder.data.model.NotificationEntity
-import com.iaguapacha.reminder.repository.ContactRepository
+import com.iaguapacha.reminder.repository.ReminderRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddBirthdayViewModel @Inject constructor(
-    private val contactRepository: ContactRepository
+    private val reminderRepository: ReminderRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddBirthdayState())
@@ -145,15 +145,15 @@ class AddBirthdayViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private  fun save() {
+    private fun save() {
         if (!validateInput()) return
 
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
             runCatching {
-                val contactId = insertContact()
-                insertNotifications(contactId)
+                val reminderId = insertReminder()
+                insertNotifications(reminderId)
                 _state.update {
                     it.copy(
                         isLoading = false,
@@ -169,13 +169,12 @@ class AddBirthdayViewModel @Inject constructor(
                 }
             }
         }
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private suspend fun insertContact(): Long {
-        return contactRepository.insertContact(
-            ContactEntity(
+    private suspend fun insertReminder(): Long {
+        return reminderRepository.insertReminder(
+            ReminderEntity(
                 name = _state.value.name,
                 day = _state.value.day.toInt(),
                 month = _state.value.month.toInt(),
@@ -184,11 +183,11 @@ class AddBirthdayViewModel @Inject constructor(
         )
     }
 
-    private suspend fun insertNotifications(contactId: Long) {
+    private suspend fun insertNotifications(reminderId: Long) {
         _state.value.notifications.forEach { type ->
-            contactRepository.insertNotification(
+            reminderRepository.insertNotification(
                 NotificationEntity(
-                    contactId = contactId,
+                    reminderId = reminderId,
                     type = type.name,
                     enabled = true
                 )

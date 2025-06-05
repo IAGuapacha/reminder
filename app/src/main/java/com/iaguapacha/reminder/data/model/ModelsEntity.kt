@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 
 @Entity
-data class ContactEntity(
+data class ReminderEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,
@@ -20,27 +20,28 @@ data class ContactEntity(
 @Entity(
     foreignKeys = [
         ForeignKey(
-            entity = ContactEntity::class,
+            entity = ReminderEntity::class,
             parentColumns = ["id"],
-            childColumns = ["contactId"],
-            onDelete = ForeignKey.CASCADE // Al eliminar el contacto se borran sus notificaciones
+            childColumns = ["reminderId"],
+            onDelete = ForeignKey.CASCADE // Al eliminar el reminder se borran sus notificaciones
         )
     ],
-    indices = [Index(value = ["contactId"])]
+    indices = [Index(value = ["reminderId"])]
 )
 data class NotificationEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val contactId: Long,
+    val reminderId: Long,
     val type: String, // Ej: "Fecha", "2 días antes", "1 semana antes"
     val enabled: Boolean = true
 )
 
-data class ContactWithNotifications(
-    @Embedded val contact: ContactEntity,
+data class ReminderWithNotifications(
+    @Embedded val reminder: ReminderEntity,
     @Relation(
         parentColumn = "id",
-        entityColumn = "contactId"
+        entityColumn = "reminderId"
     )
     val notifications: List<NotificationEntity>
 )
+
