@@ -1,4 +1,4 @@
-package com.iaguapacha.reminder.ui.addbirthday
+package com.iaguapacha.reminder.ui.birthdayform
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -49,10 +49,15 @@ import com.iaguapacha.reminder.R
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddBirthdayScreen(
+fun BirthdayFormScreen(
     navController: NavController,
-    viewModel: AddBirthdayViewModel = hiltViewModel()
+    birthdayId: Long? = null,
+    viewModel: BirthdayFormViewModel = hiltViewModel()
 ) {
+    // Si se proporciona un ID de cumpleaños, cargar los datos para edición
+    LaunchedEffect(birthdayId) {
+        birthdayId?.let { viewModel.loadBirthday(it) }
+    }
 
     val state by viewModel.state.collectAsState()
 
@@ -60,9 +65,8 @@ fun AddBirthdayScreen(
         when (state.navigationEvent) {
             NavigationEvent.Back -> {
                 navController.popBackStack()
-                viewModel.handleEvent(AddBirthdayEvent.Navigated)
+                viewModel.handleEvent(BirthdayFormEvent.Navigated)
             }
-
             null -> Unit
         }
     }
@@ -70,7 +74,14 @@ fun AddBirthdayScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(id = R.string.add_birthday_title)) },
+                title = {
+                    Text(
+                        stringResource(
+                            id = if (state.isEditMode) R.string.edit_birthday_title
+                            else R.string.add_birthday_title
+                        )
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -104,7 +115,7 @@ fun AddBirthdayScreen(
 
                 NameField(
                     value = state.name,
-                    onValueChange = { viewModel.handleEvent(AddBirthdayEvent.NameChanged(it)) },
+                    onValueChange = { viewModel.handleEvent(BirthdayFormEvent.NameChanged(it)) },
                     error = state.nameError,
                     label = stringResource(id = R.string.name)
                 )
@@ -113,9 +124,9 @@ fun AddBirthdayScreen(
                     day = state.day,
                     month = state.month,
                     year = state.year,
-                    onDayChanged = { viewModel.handleEvent(AddBirthdayEvent.DayChanged(it)) },
-                    onMonthChanged = { viewModel.handleEvent(AddBirthdayEvent.MonthChanged(it)) },
-                    onYearChanged = { viewModel.handleEvent(AddBirthdayEvent.YearChanged(it)) },
+                    onDayChanged = { viewModel.handleEvent(BirthdayFormEvent.DayChanged(it)) },
+                    onMonthChanged = { viewModel.handleEvent(BirthdayFormEvent.MonthChanged(it)) },
+                    onYearChanged = { viewModel.handleEvent(BirthdayFormEvent.YearChanged(it)) },
                     dayError = state.dayError,
                     monthError = state.monthError,
                     yearError = state.yearError,
@@ -130,7 +141,7 @@ fun AddBirthdayScreen(
                     selected = state.notifications,
                     onSelectedChange = {
                         viewModel.handleEvent(
-                            AddBirthdayEvent.NotificationToggled(
+                            BirthdayFormEvent.NotificationToggled(
                                 it
                             )
                         )
@@ -141,17 +152,17 @@ fun AddBirthdayScreen(
         bottomBar = {
             SaveButton(
                 isLoading = state.isLoading,
-                onSave = { viewModel.handleEvent(AddBirthdayEvent.Save) }
+                isEditMode = state.isEditMode,
+                onSave = { viewModel.handleEvent(BirthdayFormEvent.Save) }
             )
-
         }
     )
 }
 
-
 @Composable
 fun SaveButton(
     isLoading: Boolean,
+    isEditMode: Boolean,
     onSave: () -> Unit
 ) {
     Button(
@@ -164,7 +175,11 @@ fun SaveButton(
         if (isLoading) {
             CircularProgressIndicator(color = Color.White)
         } else {
-            Text(stringResource(id = R.string.save))
+            Text(
+                stringResource(
+                    id = if (isEditMode) R.string.update else R.string.save
+                )
+            )
         }
     }
 }
@@ -189,13 +204,6 @@ fun NameField(
             capitalization = KeyboardCapitalization.Words
         )
     )
-}
-
-
-enum class NotificationType(val label: String) {
-    ON_DATE("En la fecha"),
-    TWO_DAYS_BEFORE("2 días antes"),
-    ONE_WEEK_BEFORE("1 semana antes")
 }
 
 @Composable
@@ -224,7 +232,6 @@ fun NotificationSelection(
                     NotificationType.ONE_WEEK_BEFORE -> R.string.one_week_before
                 }), modifier = Modifier.padding(start = 8.dp))
             }
-
         }
     }
 }
@@ -246,7 +253,6 @@ fun DatePicker(
     monthLabel: String,
     yearLabel: String
 ) {
-
     Column() {
         Text(
             label,
@@ -288,7 +294,6 @@ fun DatePicker(
                     keyboardType = KeyboardType.Number
                 )
             )
-
 
             // Campo Año
             OutlinedTextField(

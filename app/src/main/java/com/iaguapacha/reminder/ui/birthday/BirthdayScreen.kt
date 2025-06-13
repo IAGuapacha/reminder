@@ -58,7 +58,7 @@ fun BirthdayScreen(
         EmptyBirthdayState(
             modifier = modifier.fillMaxSize(),
             onAddBirthday = {
-                navController.navigate(NavRoutes.AddBirthday)
+                navController.navigate(NavRoutes.BirthdayForm.createRoute())
             }
         )
     } else {

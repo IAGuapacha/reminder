@@ -44,6 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.iaguapacha.reminder.R
 import com.iaguapacha.reminder.data.model.ReminderWithNotifications
+import com.iaguapacha.reminder.navigation.NavRoutes
 import java.util.Calendar
 
 
@@ -107,7 +108,8 @@ fun BirthdayDetailScreen(
                     Detail(
                         modifier = Modifier.padding(padding),
                         reminderDetail = (state as BirthdayDetailState.Success).reminderDetail,
-                        onDeleteClick = { viewModel.onDeleteClick() }
+                        onDeleteClick = { viewModel.onDeleteClick() },
+                        onEditClick = { navController.navigate(NavRoutes.BirthdayForm.createRoute(reminderId)) }
                     )
                 }
                 is BirthdayDetailState.Error -> { }
@@ -117,7 +119,12 @@ fun BirthdayDetailScreen(
 }
 
 @Composable
-fun Detail(modifier: Modifier, reminderDetail: ReminderWithNotifications, onDeleteClick: () -> Unit) {
+fun Detail(
+    modifier: Modifier,
+    reminderDetail: ReminderWithNotifications,
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -184,7 +191,7 @@ fun Detail(modifier: Modifier, reminderDetail: ReminderWithNotifications, onDele
             )
 
             RoundedIconButton(
-                onClick = { /* Tu acción aquí */ },
+                onClick = onEditClick,
                 icon = Icons.Default.Edit,
                 contentDescription = stringResource(id = R.string.edit),
                 backgroundColor = MaterialTheme.colorScheme.secondary,

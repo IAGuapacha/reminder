@@ -1,11 +1,11 @@
-package com.iaguapacha.reminder.ui.addbirthday
+package com.iaguapacha.reminder.ui.birthdayform
 
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iaguapacha.reminder.data.model.ReminderEntity
 import com.iaguapacha.reminder.data.model.NotificationEntity
+import com.iaguapacha.reminder.data.model.ReminderEntity
 import com.iaguapacha.reminder.repository.ReminderRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,24 +16,68 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-class AddBirthdayViewModel @Inject constructor(
+class BirthdayFormViewModel @Inject constructor(
     private val reminderRepository: ReminderRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(AddBirthdayState())
+    private val _state = MutableStateFlow(BirthdayFormState())
     val state = _state.asStateFlow()
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun handleEvent(event: AddBirthdayEvent) {
+    fun loadBirthday(id: Long) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+
+            try {
+                val reminderWithNotifications = reminderRepository.getReminderWithNotifications(id)
+                reminderWithNotifications?.let { reminderData ->
+                    val reminder = reminderData.reminder
+                    val notificationTypes = reminderData.notifications.map { notification ->
+                        NotificationType.valueOf(notification.type)
+                    }.toSet()
+
+                    _state.update {
+                        it.copy(
+                            birthdayId = reminder.id,
+                            isEditMode = true,
+                            name = reminder.name,
+                            day = reminder.day.toString(),
+                            month = reminder.month.toString(),
+                            year = reminder.year?.toString() ?: "",
+                            notifications = notificationTypes,
+                            isLoading = false
+                        )
+                    }
+                } ?: run {
+                    _state.update {
+                        it.copy(
+                            error = "No se encontró el cumpleaños",
+                            isLoading = false
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(
+                        error = "Error al cargar los datos: ${e.localizedMessage}",
+                        isLoading = false
+                    )
+                }
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun handleEvent(event: BirthdayFormEvent) {
         when (event) {
-            is AddBirthdayEvent.NameChanged -> updateName(event.name)
-            is AddBirthdayEvent.NotificationToggled -> toggleNotification(event.type)
-            AddBirthdayEvent.ErrorShown -> clearError()
-            AddBirthdayEvent.Navigated -> clearNavigation()
-            AddBirthdayEvent.Save -> save()
-            is AddBirthdayEvent.DayChanged -> updateDay(event.day)
-            is AddBirthdayEvent.MonthChanged -> updateMonth(event.month)
-            is AddBirthdayEvent.YearChanged -> updateYear(event.year)
+            is BirthdayFormEvent.NameChanged -> updateName(event.name)
+            is BirthdayFormEvent.NotificationToggled -> toggleNotification(event.type)
+            BirthdayFormEvent.ErrorShown -> clearError()
+            BirthdayFormEvent.Navigated -> clearNavigation()
+            BirthdayFormEvent.Save -> save()
+            is BirthdayFormEvent.DayChanged -> updateDay(event.day)
+            is BirthdayFormEvent.MonthChanged -> updateMonth(event.month)
+            is BirthdayFormEvent.YearChanged -> updateYear(event.year)
         }
     }
 
@@ -49,15 +93,13 @@ class AddBirthdayViewModel @Inject constructor(
 
     private fun updateMonth(month: String) {
         if (month.all { it.isDigit() } || month.isEmpty()) {
-            _state.update { it.copy(month = month.take(2))
-            }
+            _state.update { it.copy(month = month.take(2)) }
         }
     }
 
     private fun updateYear(year: String) {
         if (year.all { it.isDigit() } || year.isEmpty()) {
-            _state.update { it.copy(year = year.take(4))
-            }
+            _state.update { it.copy(year = year.take(4)) }
         }
     }
 
@@ -152,8 +194,11 @@ class AddBirthdayViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true) }
 
             runCatching {
-                val reminderId = insertReminder()
-                insertNotifications(reminderId)
+                if (_state.value.isEditMode && _state.value.birthdayId != null) {
+                    updateReminder()
+                } else {
+                    insertReminder()
+                }
                 _state.update {
                     it.copy(
                         isLoading = false,
@@ -172,15 +217,39 @@ class AddBirthdayViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private suspend fun insertReminder(): Long {
-        return reminderRepository.insertReminder(
+    private suspend fun insertReminder() {
+        val reminderId = reminderRepository.insertReminder(
             ReminderEntity(
                 name = _state.value.name,
                 day = _state.value.day.toInt(),
                 month = _state.value.month.toInt(),
-                year = state.value.year.takeIf { it.isNotBlank() }?.toInt()
+                year = _state.value.year.takeIf { it.isNotBlank() }?.toInt()
             )
         )
+
+        insertNotifications(reminderId)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private suspend fun updateReminder() {
+        val birthdayId = _state.value.birthdayId ?: return
+
+        // Actualizar el recordatorio
+        reminderRepository.updateReminder(
+            ReminderEntity(
+                id = birthdayId,
+                name = _state.value.name,
+                day = _state.value.day.toInt(),
+                month = _state.value.month.toInt(),
+                year = _state.value.year.takeIf { it.isNotBlank() }?.toInt()
+            )
+        )
+
+        // Eliminar las notificaciones existentes
+        reminderRepository.deleteNotificationsForReminder(birthdayId)
+
+        // Insertar las nuevas notificaciones
+        insertNotifications(birthdayId)
     }
 
     private suspend fun insertNotifications(reminderId: Long) {

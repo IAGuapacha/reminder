@@ -15,6 +15,10 @@ class ReminderRepository @Inject constructor(
         return reminderDao.insertReminder(reminder)
     }
 
+    suspend fun updateReminder(reminder: ReminderEntity) {
+        reminderDao.updateReminder(reminder)
+    }
+
     suspend fun insertNotification(notification: NotificationEntity) {
         reminderDao.insertNotification(notification)
     }
@@ -25,6 +29,14 @@ class ReminderRepository @Inject constructor(
 
     suspend fun getDetailReminder(reminderId: Long): ReminderWithNotifications {
         return reminderDao.getReminderWithNotifications(reminderId)
+    }
+
+    suspend fun getReminderWithNotifications(reminderId: Long): ReminderWithNotifications? {
+        return reminderDao.getReminderWithNotifications(reminderId)
+    }
+
+    suspend fun deleteNotificationsForReminder(reminderId: Long) {
+        reminderDao.deleteNotificationsByReminderId(reminderId)
     }
 
     suspend fun deleteReminderWithNotifications(reminderId: Long) {
