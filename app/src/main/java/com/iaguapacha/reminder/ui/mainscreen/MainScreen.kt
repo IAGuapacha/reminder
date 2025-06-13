@@ -46,8 +46,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.iaguapacha.reminder.R
 import com.iaguapacha.reminder.navigation.NavRoutes
@@ -57,7 +55,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(navController: NavController) {
 
-    val navControllerLocal = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -71,7 +68,7 @@ fun MainScreen(navController: NavController) {
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
-                        navController.navigate(NavRoutes.AddBirthday.route)
+                        navController.navigate(NavRoutes.BirthdayForm.route)
                     },
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
@@ -86,19 +83,12 @@ fun MainScreen(navController: NavController) {
                 TopBarWithHamburgerMenu(
                     onMenuClick = { scope.launch { drawerState.open() } },
                     onNewChatClick = {
-
+                        navController.navigate(NavRoutes.BirthdayForm.route)
                     }
                 )
             }
         ) { innerPadding ->
-            NavHost(
-                navController = navControllerLocal,
-                startDestination = NavRoutes.Birthdays.route
-            ) {
-                composable(NavRoutes.Birthdays.route) { backStackEntry ->
-                    BirthdayScreen(modifier = Modifier.padding(innerPadding), navController)
-                }
-            }
+            BirthdayScreen(modifier = Modifier.padding(innerPadding), navController)
         }
     }
 }
@@ -252,4 +242,3 @@ fun shareApp(context: Context) {
 
     context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.share_via)))
 }
-

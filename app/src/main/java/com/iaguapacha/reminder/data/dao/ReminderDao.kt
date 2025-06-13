@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.iaguapacha.reminder.data.model.ReminderEntity
 import com.iaguapacha.reminder.data.model.ReminderWithNotifications
 import com.iaguapacha.reminder.data.model.NotificationEntity
@@ -14,6 +15,9 @@ interface ReminderDao {
 
     @Insert
     suspend fun insertReminder(reminder: ReminderEntity): Long
+
+    @Update
+    suspend fun updateReminder(reminder: ReminderEntity)
 
     @Insert
     suspend fun insertNotification(notification: NotificationEntity)

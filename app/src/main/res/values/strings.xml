@@ -1,9 +1,11 @@
 <resources>
     <string name="app_name">reminder</string>
     <string name="add_birthday_title">Agregar cumpleaños</string>
+    <string name="edit_birthday_title">Editar cumpleaños</string>
     <string name="back">Atrás</string>
     <string name="person">Persona</string>
     <string name="save">Guardar</string>
+    <string name="update">Actualizar</string>
     <string name="name">Nombre</string>
     <string name="notifications">Notificaciones</string>
     <string name="on_date">En la fecha</string>

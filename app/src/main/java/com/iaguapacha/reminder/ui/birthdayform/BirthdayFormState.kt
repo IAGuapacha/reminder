@@ -1,7 +1,8 @@
-package com.iaguapacha.reminder.ui.addbirthday
+package com.iaguapacha.reminder.ui.birthdayform
 
-
-data class AddBirthdayState(
+data class BirthdayFormState(
+    val birthdayId: Long? = null,
+    val isEditMode: Boolean = false,
     val name: String = "",
     val day: String = "",
     val month: String = "",
