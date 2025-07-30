@@ -29,11 +29,12 @@ data class ReminderEntity(
     indices = [Index(value = ["reminderId"])]
 )
 data class NotificationEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    @PrimaryKey
+    val id: Int = 0,
     val reminderId: Long,
     val type: String, // Ej: "Fecha", "2 días antes", "1 semana antes"
-    val enabled: Boolean = true
+    val enabled: Boolean = true,
+    val triggerTime: Long? = null
 )
 
 data class ReminderWithNotifications(
