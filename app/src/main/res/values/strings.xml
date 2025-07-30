@@ -46,4 +46,19 @@
     <string name="invalid_year">Año inválido</string>
     <string name="year_range">Año debe estar entre 1900 y %1$d</string>
     <string name="error_saving">Error al guardar: %1$s</string>
+    <string name="notification_permission_required">Se requiere permiso de notificaciones para recordarte los cumpleaños. Por favor, actívalas en la configuración del dispositivo.</string>
+    <string name="dismiss">Activar</string>
+
+    <!-- Notification texts -->
+    <string name="notification_on_date_title">¡Es el cumpleaños de %1$s!</string>
+    <string name="notification_on_date_text">No olvides felicitar a %1$s.</string>
+    <string name="notification_two_days_before_title">¡En 2 días es el cumpleaños de %1$s!</string>
+    <string name="notification_two_days_before_text">Prepárate para felicitar a %1$s en 2 días.</string>
+    <string name="notification_one_week_before_title">¡En una semana es el cumpleaños de %1$s!</string>
+    <string name="notification_one_week_before_text">Prepárate con tiempo para el cumpleaños de %1$s.</string>
+    <string name="default_reminder_name">Recordatorio</string>
+
+    <!-- Notification Channel -->
+    <string name="notification_channel_name">Recordatorios de Cumpleaños</string>
+    <string name="notification_channel_description">Notificaciones de cumpleaños</string>
 </resources>

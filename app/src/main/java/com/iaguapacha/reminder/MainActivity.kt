@@ -41,7 +41,7 @@ fun MyApp() {
         composable(NavRoutes.Main.route) { MainScreen(navController) }
 
         composable(
-            route = "birthdayForm?birthdayId={birthdayId}",
+            route = NavRoutes.BirthdayForm.route,
             arguments = listOf(
                 navArgument("birthdayId") {
                     type = NavType.StringType

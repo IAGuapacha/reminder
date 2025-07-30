@@ -1,9 +1,12 @@
 package com.iaguapacha.reminder.ui.birthdaydetail
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.iaguapacha.reminder.app.NotificationScheduler
 import com.iaguapacha.reminder.repository.ReminderRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,6 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BirthdayDetailViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val repository: ReminderRepository
 ): ViewModel() {
 
@@ -25,6 +29,7 @@ class BirthdayDetailViewModel @Inject constructor(
     val navigateBack: StateFlow<Boolean> = _navigateBack.asStateFlow()
 
     private var currentReminderId: Long? = null
+    private val notificationScheduler = NotificationScheduler(context)
 
     fun loadData(contactId: Long) {
         currentReminderId = contactId
@@ -49,6 +54,12 @@ class BirthdayDetailViewModel @Inject constructor(
     fun onDeleteConfirm() {
         val id = currentReminderId ?: return
         viewModelScope.launch {
+            val reminderWithNotifications = repository.getReminderWithNotifications(id)
+
+            reminderWithNotifications?.notifications?.forEach { notification ->
+                notificationScheduler.cancelNotification(notification.id)
+            }
+
             repository.deleteReminderWithNotifications(id)
             _showDeleteDialog.value = false
             _navigateBack.value = true
@@ -59,4 +70,3 @@ class BirthdayDetailViewModel @Inject constructor(
         _navigateBack.value = false
     }
 }
-

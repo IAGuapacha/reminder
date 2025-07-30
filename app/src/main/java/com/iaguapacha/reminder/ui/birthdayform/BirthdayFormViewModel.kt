@@ -1,13 +1,16 @@
 package com.iaguapacha.reminder.ui.birthdayform
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.iaguapacha.reminder.app.NotificationScheduler
 import com.iaguapacha.reminder.data.model.NotificationEntity
 import com.iaguapacha.reminder.data.model.ReminderEntity
 import com.iaguapacha.reminder.repository.ReminderRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -17,6 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BirthdayFormViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val reminderRepository: ReminderRepository
 ) : ViewModel() {
 
@@ -234,7 +238,6 @@ class BirthdayFormViewModel @Inject constructor(
     private suspend fun updateReminder() {
         val birthdayId = _state.value.birthdayId ?: return
 
-        // Actualizar el recordatorio
         reminderRepository.updateReminder(
             ReminderEntity(
                 id = birthdayId,
@@ -245,20 +248,41 @@ class BirthdayFormViewModel @Inject constructor(
             )
         )
 
-        // Eliminar las notificaciones existentes
-        reminderRepository.deleteNotificationsForReminder(birthdayId)
+        deleteNotifications(birthdayId)
 
-        // Insertar las nuevas notificaciones
         insertNotifications(birthdayId)
+    }
+
+    private suspend fun deleteNotifications(reminderId: Long) {
+
+        val notificationScheduler = NotificationScheduler(context)
+        val reminderWithNotifications = reminderRepository.getReminderWithNotifications(reminderId)
+
+        reminderWithNotifications?.notifications?.forEach { notification ->
+            notificationScheduler.cancelNotification(notification.id)
+        }
     }
 
     private suspend fun insertNotifications(reminderId: Long) {
         _state.value.notifications.forEach { type ->
+            val newNotificationId = System.currentTimeMillis().toInt()
+            val notificationScheduler = NotificationScheduler(context)
+
+            val trigger = notificationScheduler.scheduleBirthdayNotification(
+                newNotificationId.hashCode(),
+                _state.value.name,
+                _state.value.day.toInt(),
+                _state.value.month.toInt(),
+                type
+            )
+
             reminderRepository.insertNotification(
                 NotificationEntity(
+                    id = newNotificationId,
                     reminderId = reminderId,
                     type = type.name,
-                    enabled = true
+                    enabled = true,
+                    triggerTime = trigger
                 )
             )
         }
