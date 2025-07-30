@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -70,23 +71,19 @@ fun BirthdayScreen(
 ) {
     val reminders by viewModel.reminders.collectAsState()
 
-    // Estado para controlar si se debe mostrar el banner
     var showPermissionBanner by remember { mutableStateOf(false) }
 
-    // Solo solicitar permisos de notificación en Android 13 (API 33) o superior
     val notificationPermissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberPermissionState(android.Manifest.permission.POST_NOTIFICATIONS)
     } else null
 
-    // Actualizar el estado del banner cuando cambia el estado del permiso
     LaunchedEffect(notificationPermissionState?.status) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             notificationPermissionState != null) {
-            // Si el permiso está concedido, asegurarse de que el banner esté oculto
+
             if (notificationPermissionState.status.isGranted) {
                 showPermissionBanner = false
             } else {
-                // Solo mostrar el banner si el permiso ha sido rechazado permanentemente
                 showPermissionBanner = notificationPermissionState.status.shouldShowRationale
             }
         }
@@ -104,7 +101,6 @@ fun BirthdayScreen(
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
-        // Mostrar el banner si el permiso fue rechazado definitivamente
         if (showPermissionBanner) {
             NotificationPermissionBanner(
                 modifier = Modifier
@@ -158,7 +154,11 @@ fun CardReminder(reminder: ReminderEntity, onClick: () -> Unit) {
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text(text = reminder.name)
+                Text(
+                    text = reminder.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
                 Text(text = convertDate(reminder.day, reminder.month, reminder.year ?: 0))
                 Text(text = stringResource(id = R.string.days_until_birthday))
             }

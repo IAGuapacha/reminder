@@ -46,6 +46,7 @@ import com.iaguapacha.reminder.R
 import com.iaguapacha.reminder.data.model.ReminderWithNotifications
 import com.iaguapacha.reminder.navigation.NavRoutes
 import java.util.Calendar
+import kotlin.text.set
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -236,8 +237,8 @@ fun formatFecha(day: Int, month: Int, year: Int? = null): String {
         10 to "Octubre", 11 to "Noviembre", 12 to "Diciembre"
     )
 
-    // Año para el cálculo (el actual si no nos dan uno)
-    val yearForCalc = year ?: Calendar.getInstance().get(Calendar.YEAR)
+    // Año para el cálculo el actual
+    val yearForCalc = Calendar.getInstance().get(Calendar.YEAR)
 
     // Creamos un Calendar con la fecha indicada
     val cal = Calendar.getInstance().apply {
@@ -265,6 +266,12 @@ fun formatFecha(day: Int, month: Int, year: Int? = null): String {
 
 fun daysUntilBirthday(day: Int, month: Int): Int {
     val today = Calendar.getInstance()
+    // Establecer today a las 00:00:00.000 del día actual
+    today.set(Calendar.HOUR_OF_DAY, 0)
+    today.set(Calendar.MINUTE, 0)
+    today.set(Calendar.SECOND, 0)
+    today.set(Calendar.MILLISECOND, 0)
+
     val birthday = Calendar.getInstance()
 
     birthday.set(Calendar.MONTH, month - 1)
