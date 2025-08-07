@@ -220,7 +220,9 @@ fun NotificationSelection(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(36.dp)
                     .clickable { onSelectedChange(type) }
+                    .padding(vertical = 2.dp)
             ) {
                 Checkbox(
                     checked = selected.contains(type),

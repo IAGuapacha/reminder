@@ -57,6 +57,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 import com.iaguapacha.reminder.R
 import com.iaguapacha.reminder.data.model.ReminderEntity
 import com.iaguapacha.reminder.navigation.NavRoutes
+import com.iaguapacha.reminder.utils.DateUtils.daysUntilBirthday
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -160,7 +161,8 @@ fun CardReminder(reminder: ReminderEntity, onClick: () -> Unit) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(text = convertDate(reminder.day, reminder.month, reminder.year ?: 0))
-                Text(text = stringResource(id = R.string.days_until_birthday))
+                val days = daysUntilBirthday(reminder.day, reminder.month)
+                Text(text = stringResource(id = R.string.days_until_birthday, days ))
             }
         }
     }
