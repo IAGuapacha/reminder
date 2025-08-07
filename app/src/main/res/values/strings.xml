@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">reminder</string>
+    <string name="app_name">Cumpleaños</string>
     <string name="add_birthday_title">Agregar cumpleaños</string>
     <string name="edit_birthday_title">Editar cumpleaños</string>
     <string name="back">Atrás</string>
@@ -19,7 +19,7 @@
     <string name="empty_birthday_title">¡Aún no hay cumpleaños guardados!</string>
     <string name="empty_birthday_subtitle">Agrega el cumpleaños de tus seres queridos para recibir un recordatorio a tiempo.</string>
     <string name="add_birthday">Agregar cumpleaños</string>
-    <string name="days_until_birthday">Días para el cumpleaños</string>
+    <string name="days_until_birthday">%1$d Días para el cumpleaños</string>
     <string name="birthday">Cumpleaños</string>
     <string name="menu">Menú</string>
     <string name="new_birthday">Nuevo cumpleaños</string>
