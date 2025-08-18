@@ -57,15 +57,13 @@ class NotificationScheduler(private val context: Context) {
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // Usamos setAndAllowWhileIdle en lugar de setExactAndAllowWhileIdle
-            alarmManager.setAndAllowWhileIdle(
+            alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 calendar.timeInMillis,
                 pendingIntent
             )
         } else {
-            // Usamos set en lugar de setExact
-            alarmManager.set(
+            alarmManager.setExact(
                 AlarmManager.RTC_WAKEUP,
                 calendar.timeInMillis,
                 pendingIntent
