@@ -46,9 +46,7 @@ import com.iaguapacha.reminder.R
 import com.iaguapacha.reminder.data.model.ReminderWithNotifications
 import com.iaguapacha.reminder.navigation.NavRoutes
 import com.iaguapacha.reminder.utils.DateUtils.daysUntilBirthday
-import java.util.Calendar
-import kotlin.text.set
-
+import com.iaguapacha.reminder.utils.DateUtils.formatDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -156,7 +154,7 @@ fun Detail(
             style = MaterialTheme.typography.headlineLarge
         )
 
-        val dateFormat = formatFecha(
+        val dateFormat = formatDate(
             reminderDetail.reminder.day,
             reminderDetail.reminder.month,
             reminderDetail.reminder.year
@@ -220,49 +218,7 @@ fun Detail(
     }
 }
 
-fun formatFecha(day: Int, month: Int, year: Int? = null): String {
-    // Mapas para nombres en español
-    val diasSemana = mapOf(
-        Calendar.SUNDAY to "Domingo",
-        Calendar.MONDAY to "Lunes",
-        Calendar.TUESDAY to "Martes",
-        Calendar.WEDNESDAY to "Miércoles",
-        Calendar.THURSDAY to "Jueves",
-        Calendar.FRIDAY to "Viernes",
-        Calendar.SATURDAY to "Sábado"
-    )
-    val meses = mapOf(
-        1 to "Enero", 2 to "Febrero", 3 to "Marzo",
-        4 to "Abril", 5 to "Mayo", 6 to "Junio",
-        7 to "Julio", 8 to "Agosto", 9 to "Septiembre",
-        10 to "Octubre", 11 to "Noviembre", 12 to "Diciembre"
-    )
 
-    // Año para el cálculo el actual
-    val yearForCalc = Calendar.getInstance().get(Calendar.YEAR)
-
-    // Creamos un Calendar con la fecha indicada
-    val cal = Calendar.getInstance().apply {
-        set(Calendar.YEAR, yearForCalc)
-        set(Calendar.MONTH, month - 1)       // Calendar.MONTH es 0-based
-        set(Calendar.DAY_OF_MONTH, day)
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 0)
-    }
-
-    // Obtenemos los nombres
-    val nombreDia = diasSemana[cal.get(Calendar.DAY_OF_WEEK)] ?: "?"
-    val nombreMes = meses[month] ?: "?"
-
-    // Construimos el string, incluyendo año solo si se pasó
-    return if (year != null) {
-        "$nombreDia $day de $nombreMes, $year"
-    } else {
-        "$nombreDia $day de $nombreMes"
-    }
-}
 
 @Composable
 fun RoundedIconButton(
@@ -292,4 +248,3 @@ fun RoundedIconButton(
         )
     }
 }
-

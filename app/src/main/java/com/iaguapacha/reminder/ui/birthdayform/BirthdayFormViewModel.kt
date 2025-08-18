@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -79,9 +78,7 @@ class BirthdayFormViewModel @Inject constructor(
             BirthdayFormEvent.ErrorShown -> clearError()
             BirthdayFormEvent.Navigated -> clearNavigation()
             BirthdayFormEvent.Save -> save()
-            is BirthdayFormEvent.DayChanged -> updateDay(event.day)
-            is BirthdayFormEvent.MonthChanged -> updateMonth(event.month)
-            is BirthdayFormEvent.YearChanged -> updateYear(event.year)
+            is BirthdayFormEvent.DateChanged -> updateDate(event.day, event.month, event.year)
         }
     }
 
@@ -89,21 +86,13 @@ class BirthdayFormViewModel @Inject constructor(
         _state.update { it.copy(name = name) }
     }
 
-    private fun updateDay(day: String) {
-        if (day.all { it.isDigit() } || day.isEmpty()) {
-            _state.update { it.copy(day = day.take(2)) }
-        }
-    }
-
-    private fun updateMonth(month: String) {
-        if (month.all { it.isDigit() } || month.isEmpty()) {
-            _state.update { it.copy(month = month.take(2)) }
-        }
-    }
-
-    private fun updateYear(year: String) {
-        if (year.all { it.isDigit() } || year.isEmpty()) {
-            _state.update { it.copy(year = year.take(4)) }
+    private fun updateDate(day: String, month: String, year: String) {
+        _state.update { currentState ->
+            currentState.copy(
+                day = day,
+                month = month,
+                year = year
+            )
         }
     }
 
@@ -130,15 +119,12 @@ class BirthdayFormViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     private fun validateInput(): Boolean {
         var isValid = true
-        val currentYear = LocalDate.now().year
 
         // Resetear errores
         _state.update {
             it.copy(
                 nameError = null,
-                dayError = null,
-                monthError = null,
-                yearError = null
+                dateError = null
             )
         }
 
@@ -148,43 +134,10 @@ class BirthdayFormViewModel @Inject constructor(
             isValid = false
         }
 
-        // Validar día (1-31)
-        state.value.day.toIntOrNull()?.let { day ->
-            if (day !in 1..31) {
-                _state.update { it.copy(dayError = "Día inválido (1-31)") }
-                isValid = false
-            }
-        } ?: run {
-            _state.update { it.copy(dayError = "Día requerido") }
+        // validar fecha
+        if (state.value.day.isBlank() || state.value.month.isBlank()) {
+            _state.update { it.copy(dateError = "Fecha requerida") }
             isValid = false
-        }
-
-        // Validar mes (1-12)
-        state.value.month.toIntOrNull()?.let { month ->
-            if (month !in 1..12) {
-                _state.update { it.copy(monthError = "Mes inválido (1-12)") }
-                isValid = false
-            }
-        } ?: run {
-            _state.update { it.copy(monthError = "Mes requerido") }
-            isValid = false
-        }
-
-        // Validar año opcional (1900-Actual+1)
-        state.value.year.takeIf { it.isNotBlank() }?.let { yearStr ->
-            yearStr.toIntOrNull()?.let { year ->
-                if (year !in 1900..currentYear + 1) {
-                    _state.update {
-                        it.copy(
-                            yearError = "Año debe estar entre 1900 y ${currentYear + 1}"
-                        )
-                    }
-                    isValid = false
-                }
-            } ?: run {
-                _state.update { it.copy(yearError = "Año inválido") }
-                isValid = false
-            }
         }
 
         return isValid
