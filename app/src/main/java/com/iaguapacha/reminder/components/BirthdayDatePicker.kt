@@ -176,7 +176,6 @@ fun BirthdayDatePicker(
             }
         }
 
-        // Botón siempre visible en la parte inferior
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
