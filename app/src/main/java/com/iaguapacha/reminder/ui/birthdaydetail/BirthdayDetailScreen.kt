@@ -218,8 +218,6 @@ fun Detail(
     }
 }
 
-
-
 @Composable
 fun RoundedIconButton(
     onClick: () -> Unit,

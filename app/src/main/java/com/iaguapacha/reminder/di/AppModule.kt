@@ -3,6 +3,7 @@ package com.iaguapacha.reminder.di
 import android.content.Context
 import androidx.room.Room
 import com.iaguapacha.reminder.data.AppDatabase
+import com.iaguapacha.reminder.app.NotificationScheduler
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,4 +28,9 @@ object AppModule {
     @Provides
     fun provideReminderDao(database: AppDatabase) = database.reminderDao()
 
+    @Provides
+    @Singleton
+    fun provideNotificationScheduler(@ApplicationContext context: Context): NotificationScheduler {
+        return NotificationScheduler(context)
+    }
 }

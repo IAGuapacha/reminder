@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,7 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -30,9 +31,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -94,7 +95,7 @@ fun BirthdayFormScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.back)
                         )
                     }
@@ -152,14 +153,15 @@ fun BirthdayFormScreen(
                         onDismissRequest = { showBottomSheet = false },
                         containerColor = Color(0xFF111111),
                         dragHandle = {
-                            Surface(
+                            Box(
                                 modifier = Modifier
                                     .padding(vertical = 8.dp)
-                                    .size(width = 32.dp, height = 4.dp),
-                                color = Color.Gray,
-                                shape = RoundedCornerShape(2.dp)
-                            ) {}
-                        }
+                                    .size(width = 32.dp, height = 4.dp)
+                                    .background(Color.Gray, RoundedCornerShape(2.dp))
+                            )
+                        },
+                        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+                        windowInsets = WindowInsets(0, 0, 0, 0)
                     ) {
                         BirthdayDatePicker(
                             modifier = Modifier.padding(bottom = 16.dp),
