@@ -23,8 +23,10 @@ class BootReceiverScheduler : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+            val pendingResult = goAsync()
             CoroutineScope(Dispatchers.IO).launch {
                 rescheduleAllNotifications()
+                pendingResult.finish()
             }
         }
     }
